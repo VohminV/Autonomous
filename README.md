@@ -256,7 +256,7 @@ MIT License. См. [LICENSE](LICENSE).
 
 ---
 
-## 🙏 Благодарности
+##  Благодарности
 
 - [MuJoCo](https://mujoco.org/) — физический движок
 - [Stable-Baselines3](https://stable-baselines3.readthedocs.io/) — RL алгоритмы
@@ -264,42 +264,3 @@ MIT License. См. [LICENSE](LICENSE).
 - [PyTorch](https://pytorch.org/) — нейросетевой бэкенд
 
 ---
-
-<p align="center">
-  <i>Сделано с ❤️ для автономных систем</i>
-</p>
-```
-
----
-
-### 📝 Что ещё стоит добавить в репозиторий:
-
-1. **`LICENSE`** — файл MIT лицензии
-2. **`.gitignore`** — исключить `checkpoints/`, `rl_logs/`, `models/`, `test_videos/`, `__pycache__/`, `venv/`
-3. **`requirements.txt`** — точный список зависимостей
-4. **Скриншот/видео** работы агента (в корне репо или в `docs/`)
-5. **`scene.xml`** — обязательно закоммитить (без него код не запустится)
-
-### 💡 Рекомендация по `.gitignore`:
-
-```gitignore
-# Python
-__pycache__/
-*.py[cod]
-venv/
-.env
-
-# Обучение (тяжёлые файлы)
-checkpoints/
-models/
-rl_logs/
-test_videos/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-
-# OS
-.DS_Store
-Thumbs.db
