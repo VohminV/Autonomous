@@ -1,0 +1,103 @@
+<mujoco model="Skydio X2">
+<compiler autolimits="true" assetdir="assets"/>
+<!-- Уменьшаем timestep для более стабильной симуляции тяжелого и быстрого дрона -->
+<option timestep="0.005" density="1.225" viscosity="1.8e-5"/>
+
+<default>
+    <default class="x2">
+        <geom mass="0"/>
+        <!-- УВЕЛИЧЕНА ТЯГА: с 13 до 25 Ньютонов на мотор. 
+             Суммарно 100Н, что дает TWR ~1.7 для дрона массой 6 кг (1кг дрон + 5кг груз) -->
+        <motor ctrlrange="0 25"/>
+        <mesh scale="0.01 0.01 0.01"/>
+        
+        <default class="visual">
+            <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+        </default>
+        
+        <default class="collision">
+            <geom group="3" type="box"/>
+            <default class="rotor">
+                <geom type="ellipsoid" size=".13 .13 .01"/>
+            </default>
+        </default>
+        <site group="5"/>
+    </default>
+</default>
+
+<asset>
+    <texture type="2d" file="X2_lowpoly_texture_SpinningProps_1024.png"/>
+    <material name="phong3SG" texture="X2_lowpoly_texture_SpinningProps_1024"/>
+    <material name="invisible" rgba="0 0 0 0"/>
+    <mesh class="x2" file="X2_lowpoly.obj"/>
+</asset>
+
+<worldbody>
+    <light name="spotlight" mode="targetbodycom" target="x2" pos="0 -1 2"/>
+    
+    <body name="x2" pos="0 0 1" childclass="x2">
+        <freejoint/>
+        
+        <!-- Камера слежения (оставлена для отладки) -->
+        <camera name="track" pos="1 0 .5" xyaxes="0 1 0 -1 0 2" mode="trackcom"/>
+        
+        <!-- Оригинальная камера (оставлена для совместимости, но она смотрит назад) -->
+        <camera name="front_camera" pos="-0.16 0 0.02" xyaxes="0 1 0 0 0 1" fovy="90" mode="fixed"/>
+        
+		<!-- ИСПРАВЛЕННАЯ FPV КАМЕРА ДЛЯ 3D RL АГЕНТА -->
+		<!-- Смотрит СТРОГО ВПЕРЕД (по +X). Исправлена ошибка ориентации. -->
+		<!-- Горизонтальный взгляд критичен для оценки высоты крон/зданий при обходе. -->
+		<camera name="fpv_cam" pos="0.18 0 0.05" xyaxes="0 -1 0 0.2 0 1" fovy="100" mode="fixed"/>
+
+        <site name="imu" pos="0 0 .02"/>
+        
+        <!-- Визуальная сетка дрона -->
+        <geom material="phong3SG" mesh="X2_lowpoly" class="visual" quat="0 0 1 1"/>
+        
+        <!-- Геометрия столкновений корпуса -->
+        <geom class="collision" size=".06 .027 .02" pos=".04 0 .02"/>
+        <geom class="collision" size=".06 .027 .02" pos=".04 0 .06"/>
+        <geom class="collision" size=".05 .027 .02" pos="-.07 0 .065"/>
+        <geom class="collision" size=".023 .017 .01" pos="-.137 .008 .065" quat="1 0 0 1"/>
+        
+        <!-- Роторы (визуальные и физически влияющие на инерцию) -->
+        <geom name="rotor1" class="rotor" pos="-.14 -.18 .05" mass=".25"/>
+        <geom name="rotor2" class="rotor" pos="-.14 .18 .05" mass=".25"/>
+        <geom name="rotor3" class="rotor" pos=".14 .18 .08" mass=".25"/>
+        <geom name="rotor4" class="rotor" pos=".14 -.18 .08" mass=".25"/>
+        
+        <!-- Базовая невидимая масса корпуса -->
+        <geom size=".16 .04 .02" pos="0 0 0.02" type="ellipsoid" mass=".325" class="visual" material="invisible"/>
+        
+        <!-- НОВАЯ ПОЛЕЗНАЯ НАГРУЗКА 5 КГ -->
+        <!-- Добавляем физический объем груза под дроном. MuJoCo автоматически пересчитает центр масс и тензор инерции -->
+        <geom name="payload_5kg" type="box" size="0.08 0.08 0.04" pos="0 0 -0.06" rgba="0.2 0.2 0.2 1" mass="5.0" class="collision"/>
+
+        <!-- Точки приложения тяги моторов -->
+        <site name="thrust1" pos="-.14 -.18 .05"/>
+        <site name="thrust2" pos="-.14 .18 .05"/>
+        <site name="thrust3" pos=".14 .18 .08"/>
+        <site name="thrust4" pos=".14 -.18 .08"/>
+    </body>
+</worldbody>
+
+<actuator>
+    <!-- gear: первые 3 значения - сила (тяга), последние 3 - момент (реактивный момент для рыскания) -->
+    <motor class="x2" name="thrust1" site="thrust1" gear="0 0 1 0 0 -.0201"/>
+    <motor class="x2" name="thrust2" site="thrust2" gear="0 0 1 0 0  .0201"/>
+    <motor class="x2" name="thrust3" site="thrust3" gear="0 0 1 0 0 -.0201"/>
+    <motor class="x2" name="thrust4" site="thrust4" gear="0 0 1 0 0  .0201"/>
+</actuator>
+
+<sensor>
+    <gyro name="body_gyro" site="imu"/>
+    <accelerometer name="body_linacc" site="imu"/>
+    <framequat name="body_quat" objtype="site" objname="imu"/>
+</sensor>
+
+<keyframe>
+    <!-- ОБНОВЛЕННЫЙ HOVER: 
+         Масса дрона теперь ~6 кг. Тяга на мотор для зависания = (6 * 9.81) / 4 ≈ 14.7 Н -->
+    <key name="hover" qpos="0 0 .3 1 0 0 0" ctrl="14.72 14.72 14.72 14.72"/>
+</keyframe>
+</mujoco>

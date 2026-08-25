@@ -1,0 +1,118 @@
+<mujoco model="Skydio X2 scene - Urban Intercept (Multi-Height)">
+    <include file="x2.xml"/>
+    
+    <!-- Расширяем обзор камеры, так как сцена стала длиннее -->
+    <statistic center="20 0 10" extent="30" meansize=".5"/>
+    
+    <visual>
+        <headlight diffuse="0.6 0.6 0.6" ambient="0.4 0.4 0.4" specular="0 0 0"/>
+        <rgba haze="0.3 0.4 0.5 1"/>
+        <global azimuth="-20" elevation="-20" ellipsoidinertia="true"/>
+        <map znear="0.05" zfar="1000"/> 
+    </visual>
+    
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.6 0.7 0.8" rgb2="0.3 0.4 0.5" width="512" height="3072"/>
+        <texture type="2d" name="groundplane" builtin="checker" mark="edge" 
+                 rgb1="0.35 0.4 0.35" rgb2="0.25 0.3 0.25" markrgb="0.5 0.5 0.5" 
+                 width="300" height="300"/>
+        <material name="groundplane" texture="groundplane" texuniform="true" 
+                  texrepeat="50 50" reflectance="0.05"/>
+        <texture type="2d" file="kral_uav_texture.png"/>
+        <material name="kral_visual_mat" texture="kral_uav_texture"/>
+        <mesh file="kral_uav.obj"/>
+    </asset>
+
+    <!-- КЛАССЫ ДЛЯ ПРЕПЯТСТВИЙ (Упрощают XML и управляют физикой) -->
+    <default>
+        <default class="tree">
+            <geom type="cylinder" rgba="0.15 0.4 0.1 1" contype="1" conaffinity="1"/>
+        </default>
+        <default class="building">
+            <geom type="box" rgba="0.6 0.6 0.65 1" contype="1" conaffinity="1"/>
+        </default>
+        <default class="car">
+            <geom type="box" rgba="0.8 0.1 0.1 1" contype="1" conaffinity="1"/>
+        </default>
+        <default class="beam">
+            <geom type="box" rgba="0.3 0.3 0.3 1" contype="1" conaffinity="1"/>
+        </default>
+    </default>
+
+    <worldbody>
+        <!-- Освещение адаптировано под большую сцену -->
+        <light pos="20 20 40" dir="-1 -1 -2" directional="true" diffuse="0.8 0.8 0.8" specular="0.2 0.2 0.2"/>
+        <light pos="0 0 15" dir="0 0 1" directional="true" diffuse="0.3 0.3 0.4" specular="0 0 0"/>
+        
+        <!-- Земля -->
+        <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" contype="1" conaffinity="1"/>
+
+        <!-- ================= ЗОНА 1: ЛЕС (X: 2 до 10) ================= -->
+        <!-- Заставляет агента лететь низко/средне, огибая стволы -->
+        <body name="forest_zone" pos="0 0 0">
+            <geom name="tree1" class="tree" pos="3 -4 2" size="0.3 2"/>
+            <geom name="tree2" class="tree" pos="5 -2 2.5" size="0.25 2.5"/>
+            <geom name="tree3" class="tree" pos="7 1 1.8" size="0.35 1.8"/>
+            <geom name="tree4" class="tree" pos="4 3 2.2" size="0.2 2.2"/>
+            <geom name="tree5" class="tree" pos="8 5 3" size="0.3 3"/>
+            <geom name="tree6" class="tree" pos="2 6 1.5" size="0.25 1.5"/>
+            <geom name="tree7" class="tree" pos="6 -6 2.8" size="0.3 2.8"/>
+            <geom name="tree8" class="tree" pos="9 -1 2" size="0.2 2"/>
+        </body>
+
+        <!-- ================= ЗОНА 2: ТРАССА (X: 12 до 22) ================= -->
+        <!-- Заставляет агента перелетать через машины или лавировать -->
+        <body name="highway_zone" pos="0 0 0">
+            <!-- Полотно дороги -->
+            <geom name="road" type="box" pos="17 0 0.05" size="5 3 0.05" rgba="0.2 0.2 0.2 1" contype="1" conaffinity="1"/>
+            <!-- Разметка -->
+            <geom name="road_line" type="box" pos="17 0 0.06" size="4.5 0.1 0.01" rgba="1 1 0 1" contype="0" conaffinity="0"/>
+
+            <!-- Машины (Статичные препятствия для начала) -->
+            <geom name="car1" class="car" pos="14 1 0.6" size="1.2 0.6 0.5"/>
+            <geom name="car2" class="car" pos="17 -1 0.6" size="1.2 0.6 0.5" rgba="0.1 0.1 0.8 1"/>
+            <geom name="car3" class="car" pos="20 1.5 0.6" size="1.2 0.6 0.5" rgba="0.1 0.8 0.1 1"/>
+        </body>
+
+        <!-- ================= ЗОНА 3: ГОРОД (X: 25 до 45) ================= -->
+        <!-- Заставляет агента набирать высоту и лететь в "каньонах" -->
+        <body name="city_zone" pos="0 0 0">
+            <!-- Здания -->
+            <geom name="bldg1" class="building" pos="28 -8 8" size="3 3 8"/>
+            <geom name="bldg2" class="building" pos="28 8 12" size="3 3 12"/>
+            <geom name="bldg3" class="building" pos="35 -5 15" size="4 4 15"/>
+            <geom name="bldg4" class="building" pos="35 6 10" size="3 3 10"/>
+            <geom name="bldg5" class="building" pos="42 -9 18" size="3.5 3.5 18"/>
+            <geom name="bldg6" class="building" pos="42 7 14" size="4 4 14"/>
+
+            <!-- Парящие балки/провода (Заставляют держать конкретный коридор высоты) -->
+            <geom name="beam1" class="beam" pos="31 0 6" size="3 0.2 0.2"/>
+            <geom name="beam2" class="beam" pos="39 0 12" size="3 0.2 0.2"/>
+        </body>
+
+        <!-- ================= ВОРОТА И ЦЕЛЬ ================= -->
+        <!-- Ворота адаптированы под новые зоны -->
+        <body name="red_gate" pos="10 0 4"> 
+            <geom type="box" pos="0 -1.5 0" size="0.1 0.1 1.5" rgba="0.8 0.1 0.1 1"/>
+            <geom type="box" pos="0 1.5 0" size="0.1 0.1 1.5" rgba="0.8 0.1 0.1 1"/>
+            <geom type="box" pos="0 0 1.6" size="0.1 1.6 0.1" rgba="0.8 0.1 0.1 1"/>
+        </body>
+
+        <body name="green_gate" pos="22 0 8"> 
+            <geom type="box" pos="0 -1.5 0" size="0.1 0.1 1.5" rgba="0.1 0.8 0.1 1"/>
+            <geom type="box" pos="0 1.5 0" size="0.1 0.1 1.5" rgba="0.1 0.8 0.1 1"/>
+            <geom type="box" pos="0 0 1.6" size="0.1 1.6 0.1" rgba="0.1 0.8 0.1 1"/>
+        </body>
+
+        <!-- ЦЕЛЕВОЙ БПЛА (КРАЛ) - Перемещен в город, на высокую высоту -->
+        <body name="target_kral" pos="38 0 16" mocap="true">
+            <geom material="kral_visual_mat" mesh="kral_uav" class="visual" quat="0 0 0 1"/>
+            <geom name="target_collision" type="capsule" size="0.25 0.8" pos="0 0 0" 
+                  quat="0.707 0 0.707 0" mass="2.0" contype="1" conaffinity="1" 
+                  rgba="0.8 0.2 0.1 0.6" group="3"/>
+            <geom name="target_beacon" type="sphere" size="0.2" pos="0 0 0.3" 
+                  rgba="1 0.4 0 1" group="2"/>
+            <site name="target_center" size="0.05" rgba="0 1 0 1"/>
+        </body>
+    </worldbody>
+</mujoco>
