@@ -1,8 +1,3 @@
-Я создал файл `README.md` в рабочей среде. Однако, поскольку я текстовый ИИ и не могу напрямую отправить файл на ваш компьютер, я предоставляю его содержимое ниже в виде единого блока кода. 
-
-Вы можете нажать кнопку **"Copy"** (Копировать) в правом верхнем углу блока и сохранить это как `README.md` в корне вашего проекта.
-
-```markdown
 # 🚁 Autonomous — Visual Follow RL
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -35,11 +30,7 @@
 
 ---
 
-# 🧠 Текущая версия
-
-## V16.3
-
-Текущая архитектура использует:
+# Текущая архитектура использует
 
 - MuJoCo
 - Gymnasium
@@ -229,8 +220,6 @@ LEVEL 4
 
 # 🎯 Reward Design
 
-В V16.3 reward переработан для более стабильного обучения.
-
 Основные принципы:
 
 * reward за удержание цели в визуальном центре;
@@ -288,7 +277,7 @@ n_updates
 
 ---
 
-# 📊 Результат обучения V16.3
+# 📊 Результат обучения
 
 Промежуточный запуск:
 
@@ -303,7 +292,7 @@ Episode length:
 732 ± 136
 
 Best model:
-visual_follow_v16_3.zip
+visual_follow.zip
 ```
 
 Обучение продолжается до целевого объёма:
@@ -321,7 +310,7 @@ visual_follow_v16_3.zip
 ## 1. Клонирование
 
 ```bash
-git clone https://github.com/<your-username>/Autonomous.git
+git clone https://github.com/VohminV/Autonomous.git
 cd Autonomous
 ```
 
@@ -382,7 +371,7 @@ python train_rl_agent.py --mode train --timesteps 200000
 По завершении модель сохраняется:
 
 ```text
-visual_follow_v16_3.zip
+visual_follow.zip
 ```
 
 ---
@@ -398,7 +387,7 @@ test_visual_follow.py
 Пример:
 
 ```bash
-python test_visual_follow.py --model visual_follow_v16_3.zip --phase 4
+python test_visual_follow.py --model visual_follow.zip --phase 4
 ```
 
 По умолчанию:
@@ -424,7 +413,7 @@ test_videos/
 
 ```bash
 python test_visual_follow.py \
-    --model visual_follow_v16_3.zip \
+    --model visual_follow.zip \
     --phase 4 \
     --episodes 3
 ```
@@ -433,7 +422,7 @@ python test_visual_follow.py \
 
 ```bash
 python test_visual_follow.py \
-    --model visual_follow_v16_3.zip \
+    --model visual_follow.zip \
     --phase 4 \
     --no-video
 ```
@@ -442,7 +431,7 @@ python test_visual_follow.py \
 
 ```bash
 python test_visual_follow.py \
-    --model visual_follow_v16_3.zip \
+    --model visual_follow.zip \
     --phase 4 \
     --no-window
 ```
@@ -700,7 +689,6 @@ train/n_updates
 
 # 🛠️ План развития
 
-* [ ] Завершить обучение V16.3 на **200k timesteps**
 * [ ] Провести серию тестов на разных seed
 * [ ] Оценить среднюю дистанцию до цели
 * [ ] Оценить стабильность визуального сопровождения
@@ -720,7 +708,7 @@ train/n_updates
 Проект предназначен для:
 
 * исследования Reinforcement Learning;
-* моделирования управления БПЛА;
+* моделирования управления FPV;
 * computer vision;
 * визуального tracking;
 * simulation-based control;
@@ -749,8 +737,6 @@ MIT License.
 * [OpenCV](https://opencv.org/) — computer vision
 
 ---
-
-# 📌 Project Status
 
 Проект находится в стадии активного исследования и оптимизации RL policy.
 ```
