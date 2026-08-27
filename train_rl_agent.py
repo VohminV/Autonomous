@@ -4855,7 +4855,7 @@ def parse_args():
     parser.add_argument(
         "--model",
         default=(
-            "visual_follow_v16_3"
+            "visual_follow"
         ),
     )
 
@@ -4863,7 +4863,7 @@ def parse_args():
         "--tensorboard",
         default=(
             "./tensorboard/"
-            "visual_follow_v16_3"
+            "visual_follow"
         ),
     )
 

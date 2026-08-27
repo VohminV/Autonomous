@@ -13,7 +13,7 @@
 #   [-1,+1] x 4
 #
 # Model:
-#   visual_follow_v16_3.zip
+#   visual_follow.zip
 #
 # DEBUG ONLY:
 #   true distance
@@ -51,12 +51,12 @@ from train_rl_agent import (
 def parse_args():
 
     parser = argparse.ArgumentParser(
-        description="Test VisualFollow V16.3 SAC agent"
+        description="Test VisualFollow SAC agent"
     )
 
     parser.add_argument(
         "--model",
-        default="visual_follow_v16_3.zip",
+        default="visual_follow.zip",
         help="Путь к SAC модели",
     )
 
@@ -1297,7 +1297,7 @@ def main():
             video_path = os.path.join(
                 args.output,
                 (
-                    f"visual_follow_v16_3_"
+                    f"visual_follow_"
                     f"ep{episode}_"
                     f"{timestamp}.mp4"
                 ),
